@@ -3,6 +3,10 @@
 
 #include <stdlib.h>
 
+#include <chrono>
+#include <thread>
+
+
 // Matriz de char representnado o labirinto
 char** maze; // Voce também pode representar o labirinto como um vetor de vetores de char (vector<vector<char>>)
 
@@ -95,16 +99,19 @@ void print_maze() {
 // Recebe como entrada a posição initial e retorna um booleando indicando se a saída foi encontrada
 bool walk(pos_t pos) {
 
-	print_maze();
 
 	// Repita até que a saída seja encontrada ou não existam mais posições não exploradas
 		// Marcar a posição atual com o símbolo '.'
-		maze[pos.i][pos.j] = '.';
+		maze[pos.i][pos.j] = 'o';
 
 		// Limpa a tela
-		printf("//////////\n");
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::system("clear");
+		
+
 		// Imprime o labirinto
 		print_maze();
+		maze[pos.i][pos.j] = '.';
 		
 		/* Dado a posição atual, verifica quais sao as próximas posições válidas
 			Checar se as posições abaixo são validas (i>0, i<num_rows, j>0, j <num_cols)
@@ -135,14 +142,19 @@ bool walk(pos_t pos) {
 	 		val.i = pos.i;
 			val.j = pos.j-1;
 			valid_positions.push(val);
-			printf("left!!");
+			//printf("left!!");
 		}
 		// RIGHT
 		if(pos.j < num_cols-1 && maze[pos.i][pos.j+1] == 'x'){
 	 		val.i = pos.i;
 			val.j = pos.j+1;
 			valid_positions.push(val);
-			printf("right!!");
+			//printf("right!!");
+		}
+
+		if ((pos.i > 0 && maze[pos.i-1][pos.j] == 's') || (pos.i < num_rows-1 && maze[pos.i+1][pos.j] == 's') || 
+			(pos.j > 0 && maze[pos.i][pos.j-1] == 's') || (pos.j < num_cols-1 && maze[pos.i][pos.j+1] == 's')) {
+			return true;
 		}
 
 		
@@ -153,24 +165,29 @@ bool walk(pos_t pos) {
 		if (!valid_positions.empty()) {
 			pos_t next_position = valid_positions.top();
 			valid_positions.pop();
-			printf("NÃO ESTÁ VAZIO!!\n");
+			//printf("NÃO ESTÁ VAZIO!!\n");
 			walk(next_position);
 		}
 		else{
-			printf("VAZIO!!\n");
+			//printf("VAZIO!!\n");
 		}
 	return false;
 }
 
 int main(int argc, char* argv[]) {
 	// carregar o labirinto com o nome do arquivo recebido como argumento
-	pos_t initial_pos = load_maze("../data/maze.txt");
+	pos_t initial_pos = load_maze("../data/maze6.txt");
 	// chamar a função de navegação
 	bool exit_found = walk(initial_pos);
 	
 	//system("clear");
+	
 
 	// Tratar o retorno (imprimir mensagem)
-	
+	printf("Encontrado!!\n");
+	if (exit_found == true) {
+
+	} 
+
 	return 0;
 }
